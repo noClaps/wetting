@@ -12,7 +12,7 @@ class Vec2D:
         return abs(self.x - vec.x) + abs(self.y - vec.y) == 1
 
     def is_next_nearest(self, vec):
-        return abs(self.x - vec.x) == 1 and abs(self.y - vec.y) == 1 
+        return abs(self.x - vec.x) == 1 and abs(self.y - vec.y) == 1
 
 
 def density(beta, potential, phi, chem_pot):
@@ -57,5 +57,7 @@ def main():
 
     zeta_LJ = interaction_sum(eps, num_sites)
     print("ζ_LJ:", zeta_LJ)
+
+    print("Hi Ethan!")
 
 main()
