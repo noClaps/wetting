@@ -12,6 +12,7 @@ class Vec2D:
         return abs(self.x - vec.x) + abs(self.y - vec.y) == 1
 
     def is_next_nearest(self, vec):
+        return abs(self.x - vec.x) == 1 and abs(self.y - vec.y) == 1 
 
 
 def density(beta, potential, phi, chem_pot):
