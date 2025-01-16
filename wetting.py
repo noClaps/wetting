@@ -46,8 +46,8 @@ def main():
     temp = 293 # K
     beta = 1/(BOLTZMANN * temp) # 1/J
 
-    potential = np.zeros(num_sites, num_sites)
-    phi = np.zeros(num_sites, num_sites)
+    potential = np.zeros((num_sites, num_sites))
+    phi = np.zeros((num_sites, num_sites))
 
     ref_sys = ref_sys_part_fn(beta, potential, phi, chem_pot)
     print("Ξ:", ref_sys)
