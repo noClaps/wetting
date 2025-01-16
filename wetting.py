@@ -58,6 +58,5 @@ def main():
     zeta_LJ = interaction_sum(eps, num_sites)
     print("ζ_LJ:", zeta_LJ)
 
-    print("Hi Ethan!")
 
 main()
