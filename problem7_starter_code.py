@@ -72,8 +72,7 @@ lowT = [f(rho) for f in funcs] #Returns a list of Nx1 float arrays
 
 roots = [find_roots(f) for f in funcs] #Find the roots for each function
 
-# for i in range[curve]:
-#     if 
+
 
 
 # #Plot
@@ -85,6 +84,8 @@ roots = [find_roots(f) for f in funcs] #Find the roots for each function
 
 # ax1.set_xlabel('Density Rho')
 # ax1.set_ylabel('Function')
+
+
 
 
 def rho_plus_minus(sign):
@@ -99,7 +100,7 @@ def chem_pot_func():
 
     kB = 1E-23
     a = 1E-23
-    xarr = np.linspace(0, 1.25, N)
+
     yarr = np.linspace(0, 1.25, N)
 
     rho1 = rho_plus_minus(1)
