@@ -97,7 +97,7 @@ def chem_pot_func():
     ax2.plot(rightline,kBTe, "blue")
     ax2.plot(centreline,kBTe, "red")
 
-    ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3])*1E-23,[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
+    ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3]),[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
 
 
 
