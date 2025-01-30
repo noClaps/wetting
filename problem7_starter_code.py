@@ -62,7 +62,7 @@ def plotroots():
     lowT = [f(rho) for f in funcs] #Returns a list of Nx1 float arrays
 
     roots = [find_roots(f) for f in funcs] #Find the roots for each function
-    
+
     fig1, ax1 = py.subplots()
     for curve in lowT:
         ax1.plot(rho,curve)
@@ -90,6 +90,8 @@ def chem_pot_func():
     rightline = kBTe*np.log(rho2/rho1) - 5*rho2
     centreline = np.ones(100)*(-5/2)
 
+    ax2.set_xlabel(r"$\mu / \epsilon$")
+    ax2.set_ylabel(r"$k_B T / \epsilon$")
 
     ax2.plot(leftline,kBTe, "blue")
     ax2.plot(rightline,kBTe, "blue")
@@ -107,10 +109,10 @@ densities = np.ones((N,N))
 
 for i in range(N):
     for j in range(N):
-        
+
         f = func(1/kBTarr[i], muarr[j])
         roots = find_roots(f)
-        
+
         if len(roots) == 1:
             densities[i,j] = roots[0]
         else:
@@ -137,11 +139,8 @@ py.plot(leftline, kBTe, "blue", linewidth=4)
 py.plot(rightline, kBTe, "blue", linewidth=4)
 py.plot(centreline, kBTe, "red", linewidth=3)
 
-py.xlabel("µ/ε")
-py.ylabel("k_BT/ε")
+py.xlabel(r"$\mu / \epsilon$")
+py.ylabel(r"$k_BT/\epsilon$")
 py.title("Phase Diagram with Density Gradient")
 cbar = py.colorbar()
-cbar.set_label('Density ρ', rotation=270)
-
-
-
+cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
