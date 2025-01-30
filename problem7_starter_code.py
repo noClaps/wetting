@@ -23,7 +23,7 @@ def find_roots(f):
   #Find if there are any other roots by using intervals above this solution
   tol = 1e-2 #Small shift above found root
   start = sol + tol
-  step = 1e-1 #Small step used to find bounding interval for next root
+  step = 1e-2 #Small step used to find bounding interval for next root
   finish = sol + step
   #Continue looping and adding roots until finish becomes unphysical (>1)
 
@@ -129,13 +129,13 @@ leftline = kBTe*np.log(rho1/rho2) - 5*rho1
 rightline = kBTe*np.log(rho2/rho1) - 5*rho2
 centreline = np.ones(100)*(-5/2)
 
-fig3, ax3 = py.subplots()
+fig3, ax3 = py.subplots(figsize=(8,6))
 
 py.pcolormesh(muarr, kBTarr, densities)
 
-py.plot(leftline, kBTe, "blue")
-py.plot(rightline, kBTe, "blue")
-py.plot(centreline, kBTe, "red")
+py.plot(leftline, kBTe, "blue", linewidth=4)
+py.plot(rightline, kBTe, "blue", linewidth=4)
+py.plot(centreline, kBTe, "red", linewidth=3)
 
 py.xlabel("µ/ε")
 py.ylabel("k_BT/ε")
