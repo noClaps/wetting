@@ -118,8 +118,44 @@ def chem_pot_func():
 
     ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3])*1E-23,[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
 
+betaarr = np.linspace(0,2,N)
+muarr = np.linspace(-5,0,N)
+
+funcs = []
+
+for beta in betaarr:
+    funcs += [func(beta, mu) for mu in muarr]
 
 
+roots = [find_roots(f) for f in funcs] #Find the roots for each function
+print(roots)
+
+def low_mid_high_density(densities, lowhigh):
+    match lowhigh:
+        case "low":
+          lowdensities = []
+          for d in densities:
+             if d < 0.5:
+                lowdensities.append(d)
+             else:
+                lowdensities.append(0)
+          return lowdensities
+        case "high":
+          lowdensities = []
+          for d in densities:
+             if d < 0.5:
+                lowdensities.append(d)
+             else:
+                lowdensities.append(0)
+          return lowdensities
+          
+          
+        
+        
+
+# lowdensities = np.fromiter((i for i in roots if ))
+
+        
 
 
 
