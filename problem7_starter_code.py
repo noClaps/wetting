@@ -139,7 +139,9 @@ py.plot(centreline, kBTe, "red")
 
 py.xlabel("µ/ε")
 py.ylabel("k_BT/ε")
-py.colorbar()
+py.title("Phase Diagram with Density Gradient")
+cbar = py.colorbar()
+cbar.set_label('Density ρ', rotation=270)
 
 
 
