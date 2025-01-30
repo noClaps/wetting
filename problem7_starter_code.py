@@ -86,14 +86,14 @@ def chem_pot_func():
     rho2 = rho_plus_minus(-1, kBTe)
 
 
-    xarr1 = kBTe*np.log(rho1/(rho2)) - 5*rho1
-    xarr2 = kBTe*np.log(rho2/(rho1)) - 5*rho2
-    xarr3 = np.ones(100)*(-5/2)
+    leftline = kBTe*np.log(rho1/rho2) - 5*rho1
+    rightline = kBTe*np.log(rho2/rho1) - 5*rho2
+    centreline = np.ones(100)*(-5/2)
 
 
-    ax2.plot(xarr1,kBTe, "blue")
-    ax2.plot(xarr2,kBTe, "blue")
-    ax2.plot(xarr3,kBTe, "red")
+    ax2.plot(leftline,kBTe, "blue")
+    ax2.plot(rightline,kBTe, "blue")
+    ax2.plot(centreline,kBTe, "red")
 
     ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3])*1E-23,[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
 
@@ -119,22 +119,27 @@ for i in range(N):
 
 
 
-kBTe = np.linspace(0, 1.25, N)
+kBTe = np.linspace(0.01, 1.25, N)
 
 rho1 = rho_plus_minus(1, kBTe)
 rho2 = rho_plus_minus(-1, kBTe)
 
 
-xarr1 = kBTe*np.log(rho1/(rho2)) - 5*rho1
-xarr2 = kBTe*np.log(rho2/(rho1)) - 5*rho2
-xarr3 = np.ones(100)*(-5/2)
+leftline = kBTe*np.log(rho1/rho2) - 5*rho1
+rightline = kBTe*np.log(rho2/rho1) - 5*rho2
+centreline = np.ones(100)*(-5/2)
 
 fig3, ax3 = py.subplots()
 
 py.pcolormesh(muarr, kBTarr, densities)
 
-py.plot(xarr1, kBTe, "blue")
-py.plot(xarr2, kBTe, "blue")
-py.plot(xarr3, kBTe, "red")
+py.plot(leftline, kBTe, "blue")
+py.plot(rightline, kBTe, "blue")
+py.plot(centreline, kBTe, "red")
+
+py.xlabel("µ/ε")
+py.ylabel("k_BT/ε")
+py.colorbar()
+
 
 
