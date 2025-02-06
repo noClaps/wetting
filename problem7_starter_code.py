@@ -91,7 +91,7 @@ def chem_pot_func(num_samples = 100):
     ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3]),[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
 
 
-def phase_density(num_samples = 100):
+def phase_density(num_samples = 100, density_limit = -1):
     kBTarr = np.linspace(0.01,2,num_samples)
     muarr = np.linspace(-5,0,num_samples)
     densities = np.ones((num_samples,num_samples))
@@ -104,7 +104,7 @@ def phase_density(num_samples = 100):
             if len(roots) == 1:
                 densities[i,j] = roots[0]
             else:
-                densities[i,j] = -1
+                densities[i,j] = density_limit
 
     kBTe = np.linspace(0.01, 1.25, num_samples)
 
