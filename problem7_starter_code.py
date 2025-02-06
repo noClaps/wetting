@@ -1,69 +1,64 @@
 import scipy as sp
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as py
+import matplotlib.pyplot as plt
 
-
-
-#Some global settings for matplotlib plots
+# Some global settings for matplotlib plots
 matplotlib.rcParams['font.size'] = 12
 matplotlib.rcParams['font.weight'] = 'bold'
 
-
-
+# Helper functions
 def func(beta,mu):
     return lambda rho : rho-(1.0-rho)*np.exp(beta*(mu+5.0*rho))
 
 def find_roots(f):
   roots = []
-  #Compute a root over the entire range [0,1]
+  # Compute a root over the entire range [0,1]
   sol = sp.optimize.brentq(f,0,1) #Use Brent's method - will find smallest root
   roots.append(sol)
 
-  #Find if there are any other roots by using intervals above this solution
-  tol = 1e-2 #Small shift above found root
+  # Find if there are any other roots by using intervals above this solution
+  tol = 1e-2 # Small shift above found root
   start = sol + tol
-  step = 1e-2 #Small step used to find bounding interval for next root
+  step = 1e-2 # Small step used to find bounding interval for next root
   finish = sol + step
-  #Continue looping and adding roots until finish becomes unphysical (>1)
+  # Continue looping and adding roots until finish becomes unphysical (>1)
 
   while finish <= 1.0:
-    #Brent method will fail if f(start) and f(finish) have the same sign,
-    #so keep trying until it works:
+    # Brent method will fail if f(start) and f(finish) have the same sign,
+    # so keep trying until it works:
 
     try:
       sol = sp.optimize.brentq(f,start,finish)
       roots.append(sol)
-      start = sol + tol #Pick new interval start beyond root just found
-      finish = sol + step #Assign new finish beyond it also and continue looping
+      start = sol + tol # Pick new interval start beyond root just found
+      finish = sol + step # Assign new finish beyond it also and continue looping
 
     except:
-      finish += step  #Enlarge interval until root can be found (if any)
+      finish += step  # Enlarge interval until root can be found (if any)
   return roots
 
-def plotroots():
-    N = 100 #Density samples to use
-    rho = np.linspace(0,1,N) #Density values to evaluate
+def rho_plus_minus(sign, kBTe):
+    # sign is +1 or -1
+    return (1/2)*(1 + sign * np.sqrt(1 - 4*kBTe/5))
 
 
+# Plotting functions
+def plotroots(num_samples = 100):
+    rho = np.linspace(0,1,num_samples) # Density values to evaluate
 
-    #Evaluate the density profiles for the various parameter regimes
-    muVals = [-3.0]   #Chemical potentials to test
-
-
+    # Evaluate the density profiles for the various parameter regimes
+    muVals = [-3.0]   # Chemical potentials to test
 
     # --- Low temperature case ---
     beta = 2/3
-    funcs = [func(beta,mu) for mu in muVals] #Define a list of functions with the beta and mu specified
+    funcs = [func(beta,mu) for mu in muVals] # Define a list of functions with the beta and mu specified
 
+    # Evaluate the functions for plotting
+    lowT = [f(rho) for f in funcs] # Returns a list of Nx1 float arrays
+    roots = [find_roots(f) for f in funcs] # Find the roots for each function
 
-
-    #Evaluate the functions for plotting
-    lowT = [f(rho) for f in funcs] #Returns a list of Nx1 float arrays
-
-    roots = [find_roots(f) for f in funcs] #Find the roots for each function
-
-    fig1, ax1 = py.subplots()
+    fig1, ax1 = plt.subplots()
     for curve in lowT:
         ax1.plot(rho,curve)
 
@@ -72,15 +67,11 @@ def plotroots():
     ax1.set_xlabel('Density Rho')
     ax1.set_ylabel('Function')
 
-def rho_plus_minus(sign, kBTe):
-    # sign is +1 or -1
-    return (1/2)*(1 + sign * np.sqrt(1 - 4*kBTe/5))
-
-def chem_pot_func():
-    fig2, ax2 = py.subplots()
+def chem_pot_func(num_samples = 100):
+    fig2, ax2 = plt.subplots()
     ax2.set_ylim(0, 1.6)
 
-    kBTe = np.linspace(0, 1.25, N)
+    kBTe = np.linspace(0, 1.25, num_samples)
 
     rho1 = rho_plus_minus(1, kBTe)
     rho2 = rho_plus_minus(-1, kBTe)
@@ -100,47 +91,49 @@ def chem_pot_func():
     ax2.plot(np.array([-2,-2.5,-3,-2,-2.5,-3]),[1,1,1,3/2,3/2,3/2], 'o', color = "orange")
 
 
+def phase_density(num_samples = 100):
+    kBTarr = np.linspace(0.01,2,num_samples)
+    muarr = np.linspace(-5,0,num_samples)
+    densities = np.ones((num_samples,num_samples))
 
-N = 100
+    for i in range(num_samples):
+        for j in range(num_samples):
+            f = func(1/kBTarr[i], muarr[j])
+            roots = find_roots(f)
 
-kBTarr = np.linspace(0.01,2,N)
-muarr = np.linspace(-5,0,N)
-densities = np.ones((N,N))
+            if len(roots) == 1:
+                densities[i,j] = roots[0]
+            else:
+                densities[i,j] = -1
 
-for i in range(N):
-    for j in range(N):
+    kBTe = np.linspace(0.01, 1.25, num_samples)
 
-        f = func(1/kBTarr[i], muarr[j])
-        roots = find_roots(f)
+    rho1 = rho_plus_minus(1, kBTe)
+    rho2 = rho_plus_minus(-1, kBTe)
 
-        if len(roots) == 1:
-            densities[i,j] = roots[0]
-        else:
-            densities[i,j] = -1
+    leftline = kBTe*np.log(rho1/rho2) - 5*rho1
+    rightline = kBTe*np.log(rho2/rho1) - 5*rho2
+    centreline = np.ones(100)*(-5/2)
 
+    fig3, ax3 = plt.subplots(figsize=(8,6))
 
+    plt.pcolormesh(muarr, kBTarr, densities)
 
+    plt.plot(leftline, kBTe, "blue", linewidth=4)
+    plt.plot(rightline, kBTe, "blue", linewidth=4)
+    plt.plot(centreline, kBTe, "red", linewidth=3)
 
-kBTe = np.linspace(0.01, 1.25, N)
+    plt.xlabel(r"$\mu / \epsilon$")
+    plt.ylabel(r"$k_BT/\epsilon$")
+    plt.title("Phase Diagram with Density Gradient")
+    cbar = plt.colorbar()
+    cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
-rho1 = rho_plus_minus(1, kBTe)
-rho2 = rho_plus_minus(-1, kBTe)
+def main():
+    plotroots()
+    chem_pot_func()
+    phase_density()
+    plt.show()
 
-
-leftline = kBTe*np.log(rho1/rho2) - 5*rho1
-rightline = kBTe*np.log(rho2/rho1) - 5*rho2
-centreline = np.ones(100)*(-5/2)
-
-fig3, ax3 = py.subplots(figsize=(8,6))
-
-py.pcolormesh(muarr, kBTarr, densities)
-
-py.plot(leftline, kBTe, "blue", linewidth=4)
-py.plot(rightline, kBTe, "blue", linewidth=4)
-py.plot(centreline, kBTe, "red", linewidth=3)
-
-py.xlabel(r"$\mu / \epsilon$")
-py.ylabel(r"$k_BT/\epsilon$")
-py.title("Phase Diagram with Density Gradient")
-cbar = py.colorbar()
-cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
+if __name__ == "__main__":
+    main()
