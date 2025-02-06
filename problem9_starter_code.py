@@ -221,10 +221,10 @@ def main():
     # problem9()
 
     
-    problem10(-2.53)
+    # problem10(-2.53)
 
     
-    # plotproblem11()
+    plotproblem11()
     
 
 
