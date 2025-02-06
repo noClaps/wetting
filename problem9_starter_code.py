@@ -148,7 +148,7 @@ def problem10(mu):
 
     plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
 
-
+    plt.plot()
 
 
 
@@ -162,79 +162,17 @@ def problem11(mu, Ly):
     count = 30000 #Upper limit for iterations
     alpha  = 0.01 #Mixing parameter
 
-    #Solve equations iteratively:
+
     conv = 1
     cnt = 1
-    global rho
-    rho = rho_0*np.ones(Ly)
-    rho_new = np.zeros(Ly)
-
-    sol = find_roots(func(beta,mu))
-
-    rho[0] = 0
-    rho[-1] = min(sol)
-
-    while conv >= tol and cnt<count:
-        cnt = cnt + 1
-
-        for j in range(1,Ly-1):
-            #Handle the periodic boundaries for x and y:
-            down = np.mod((j-1),Ly)
-            up = np.mod((j+1),Ly)
-
-            v_j = -epsilon_wall*j**(-3)
-            rho_new[j] = (1 - rho[j])*np.exp(beta*(3/2)*(rho[down] + rho[up]) + 2 * rho[j] + mu - v_j)
-
-        conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
-        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
-        
-        rho[0] = 0
-        rho[-1] = min(sol)
     
-
-    # rho_0 = min(sol)
-    # rho = rho_0*np.ones(Ly)
-    # rho[0] = 0
-    # rho_new = np.zeros(Ly)
+    gas_bulk = min(find_roots(func(beta,mu)))
     
-    # while conv >= tol and cnt<count:
-    #     cnt = cnt + 1
-
-    #     for j in range(Ly):
-            
-    #         if j == 0:
-    #             rho_new[j] = 0
-                
-    #         elif j == Ly-1:
-    #             rho_new[j] = rho_0
-                
-    #         else:
-    #             down = np.mod((j-1),Ly)
-    #             up = np.mod((j+1),Ly)
-
-    #             v_j = -epsilon_wall*j**(-3)
-    #             rho_new[j] = (1 - rho[j])*np.exp(beta*(3/2)*(rho[down] + rho[up]) + 2 * rho[j] + mu - v_j)
-
-    #     conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
-    #     rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
-        
-    #     rho[0] = 0
-    
-    
-    
-        
-        
-    plt.plot(np.linspace(0, Ly, Ly), rho)
-
-    return rho
-    
-
-def wall_solver_1D(Ly,beta,mu,rho_0,tol,count,alpha,eps_w,gas_bulk):
-    conv = 1
-    cnt = 1
     rho = rho_0*np.ones(Ly)
     rho[0] = 0
     rho_new = np.zeros(Ly);
+    
+    
     while conv >= tol and cnt<count:
         for j in range(Ly):
             #Handle the periodic boundaries for x and y:
@@ -245,19 +183,13 @@ def wall_solver_1D(Ly,beta,mu,rho_0,tol,count,alpha,eps_w,gas_bulk):
             elif j == 0:
                 rho_new[j] = 0
             else:
-                rho_new[j] = (1 - rho[j])*np.exp(beta*((3/2)*(rho[down] + rho[up]) + 2*rho[j] + mu + eps_w*(j)**(-3)))
+                rho_new[j] = (1 - rho[j])*np.exp(beta*((3/2)*(rho[down] + rho[up]) + 2*rho[j] + mu + epsilon_wall*(j)**(-3)))
     
         conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
         cnt = cnt + 1
-        
-    plt.plot(np.linspace(0, Ly, Ly), rho)
 
-        
-        
-    return np.array(rho)
-
-
+    return rho
     
 
 def plotproblem11():
@@ -281,29 +213,20 @@ def plotproblem11():
     plt.ylabel(r"Density $\rho\sigma^2$")
 
     plt.title("Density profiles close to the wall")
+    plt.show()
 
 
 
 def main():
     # problem9()
 
-    # mu = -2.67 # Chemical potential mu/epsilon
     
-    # problem10(mu)
+    problem10(-2.53)
+
     
-    # problem11(-2.67, 10)
     # plotproblem11()
-    Ly = 10
-    beta =1.2
-    mu =-2.67
-    rho_0 =0.51
-    tol = 1e-12 #Convergence tolerance
-    count = 30000 #Upper limit for iterations
-    alpha  = 0.01 #Mixing parameter
-    eps_w = 4/3
-    gas_bulk = min(find_roots(func(beta,mu)))
-    wall_solver_1D(Ly,beta,mu,rho_0,tol,count,alpha,eps_w,gas_bulk)
     
-    plt.show()
+
+
 
 main()
