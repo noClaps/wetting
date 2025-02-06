@@ -61,6 +61,23 @@ while conv >= tol and cnt<count:
   conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
   rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
+plt.imshow(rho, extent=(0, Lx, 0, Ly), vmin=-1, vmax=1)
+cbar = plt.colorbar()
+cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
+
+plt.xlabel("Lattice points")
+plt.ylabel("Lattice points")
+
+plt.grid(True, linestyle="--")
+plt.xticks(np.linspace(0, Lx, Lx+1))
+plt.yticks(np.linspace(0, Ly, Ly+1))
+for (i, j), z in np.ndenumerate(rho):
+    plt.text(j+0.5, i+0.5, "{:0.3f}".format(z), ha="center", va="center")
+
+plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
+
+plt.show()
+
 print(rho[0,0])
 sol = find_roots(func(beta,mu))
 print(sol)
