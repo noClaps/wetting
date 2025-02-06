@@ -89,69 +89,68 @@ def problem9():
 
 
 
+def problem10(mu):
+    Lx = 3 #Number of sites along x-axis
+    Ly = 12 #Number of sites along y-axis
 
-Lx = 3 #Number of sites along x-axis
-Ly = 12 #Number of sites along y-axis
+    beta = 1.2 #Inverse temperature beta*epsilon
+    beta_epsilon_wall = 1.6
 
-beta = 1.2 #Inverse temperature beta*epsilon
-mu = -2.67 #Chemical potential mu/epsilon
-beta_epsilon_wall = 1.6
+    rho_0 = 0.51 #Initial density
+    tol = 1e-12 #Convergence tolerance
+    count = 30000 #Upper limit for iterations
+    alpha  = 0.01 #Mixing parameter
 
-rho_0 = 0.51 #Initial density
-tol = 1e-12 #Convergence tolerance
-count = 30000 #Upper limit for iterations
-alpha  = 0.01 #Mixing parameter
+    #Solve equations iteratively:
+    conv = 1
+    cnt = 1
+    rho = rho_0*np.ones([Lx,Ly])
+    rho_new = np.zeros([Lx,Ly])
 
-#Solve equations iteratively:
-conv = 1
-cnt = 1
-rho = rho_0*np.ones([Lx,Ly])
-rho_new = np.zeros([Lx,Ly])
+    sol = find_roots(func(beta,mu))
 
-sol = find_roots(func(beta,mu))
+    rho[:,0] = 0
+    rho[:,-1] = min(sol)
 
-rho[:,0] = 0
-rho[:,-1] = min(sol)
+    while conv >= tol and cnt<count:
+        cnt = cnt + 1
+        for i in range(Lx):
+            for j in range(1,Ly-1):
+                #Handle the periodic boundaries for x and y:
+                left = np.mod((i-1),Lx)
+                right = np.mod((i+1),Lx)
+                down = np.mod((j-1),Ly)
+                up = np.mod((j+1),Ly)
 
-while conv >= tol and cnt<count:
-  cnt = cnt + 1
-  for i in range(Lx):
-    for j in range(1,Ly-1):
-      #Handle the periodic boundaries for x and y:
+                v_j = -beta_epsilon_wall*j**(-3)
+                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
 
-      left = np.mod((i-1),Lx)
-      right = np.mod((i+1),Lx)
-      down = np.mod((j-1),Ly)
-      up = np.mod((j+1),Ly)
+        conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
-      v_j = -beta_epsilon_wall*j**(-3)
-      rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+    rho_t = rho.T
+    rho_t[0, :] = math.inf
+    plt.pcolor(rho_t, vmin=-1, vmax=1)
+    cbar = plt.colorbar()
+    cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
+    plt.xlabel("Lattice points")
+    plt.ylabel("Lattice points")
 
+    plt.grid(True, linestyle="--")
+    plt.xticks(np.linspace(0, Lx, Lx+1))
+    plt.yticks(np.linspace(0, Ly, Ly+1))
+    for (i, j), z in np.ndenumerate(rho):
+        plt.text(i+0.5, j+0.5, "{:0.1f}".format(z), ha="center", va="center")
 
-  conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
-  rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+    plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
 
-rho_t = rho.T
-rho_t[0, :] = math.inf
-plt.pcolor(rho_t, vmin=-1, vmax=1)
-cbar = plt.colorbar()
-cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
-
-plt.xlabel("Lattice points")
-plt.ylabel("Lattice points")
-
-plt.grid(True, linestyle="--")
-plt.xticks(np.linspace(0, Lx, Lx+1))
-plt.yticks(np.linspace(0, Ly, Ly+1))
-for (i, j), z in np.ndenumerate(rho):
-    plt.text(i+0.5, j+0.5, "{:0.1f}".format(z), ha="center", va="center")
-
-plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
-
-plt.show()
 
 def main():
-    problem9()
+    # problem9()
 
-# main()
+    mu = -2.67 # Chemical potential mu/epsilon
+    problem10(mu)
+    plt.show()
+
+main()
