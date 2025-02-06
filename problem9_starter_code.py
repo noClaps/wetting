@@ -1,6 +1,7 @@
 import scipy.optimize as sp
 import numpy as np
 import matplotlib.pyplot as plt
+import math 
 
 #Equation whose root defines the homogeneous equilibrium solutions:
 def func(beta,mu):
@@ -35,9 +36,9 @@ def problem9():
     Lx = 4 #Number of sites along x-axis
     Ly = 4 #Number of sites along y-axis
     beta = 1 #Inverse temperature beta*epsilon
-    mu = -3.5 #Chemical potential mu/epsilon
+    mu = -2.5 #Chemical potential mu/epsilon
 
-    rho_0 = 0.51 #Initial density
+    rho_0 = 0.49 #Initial density
     tol = 1e-12 #Convergence tolerance
     count = 30000 #Upper limit for iterations
     alpha  = 0.01 #Mixing parameter
@@ -89,10 +90,10 @@ def problem9():
 
 
 
-Lx = 12 #Number of sites along x-axis
-Ly = 20 #Number of sites along y-axis
-beta = 1 #Inverse temperature beta*epsilon
-mu = -3.5 #Chemical potential mu/epsilon
+Lx = 25 #Number of sites along x-axis
+Ly = 1 #Number of sites along y-axis
+beta = 1.2 #Inverse temperature beta*epsilon
+mu = -2.67 #Chemical potential mu/epsilon
 betaepsilonwall = 1.6
 
 rho_0 = 0.51 #Initial density
@@ -112,21 +113,22 @@ while conv >= tol and cnt<count:
       #Handle the periodic boundaries for x and y:
       
       if i == 0:
-          rho_new[i,j] = -1
+          rho_new[i,j] = 0
     
       else:    
+          vj = -betaepsilonwall*i**(-3)
+          print(vj)
           left = np.mod((i-1),Lx) 
           right = np.mod((i+1),Lx) 
           down = np.mod((j-1),Ly) 
           up = np.mod((j+1),Ly) 
-          rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu)) -betaepsilonwall*i**(-3)
-
+          rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - vj))
 
 
   conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
   rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
-plt.imshow(rho, extent=(0, Lx, 0, Ly), vmin=-1, vmax=1)
+plt.imshow(rho, extent=(0, Lx, 0, Ly))
 cbar = plt.colorbar()
 cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
