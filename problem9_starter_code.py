@@ -89,7 +89,7 @@ def problem10(mu):
     Ly = 20 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
-    beta_epsilon_wall = 1.6
+    beta_epsilon_wall = 4/3
 
     rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
@@ -150,10 +150,9 @@ def problem10(mu):
 
 
 def problem11(mu, Ly):
-    Lx = 1 #Number of sites along x-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
-    beta_epsilon_wall = 1.6
+    epsilon_wall = 4/3
 
     rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
@@ -164,34 +163,64 @@ def problem11(mu, Ly):
     conv = 1
     cnt = 1
     global rho
-    rho = rho_0*np.ones([Lx,Ly])
-    rho_new = np.zeros([Lx,Ly])
+    rho = rho_0*np.ones(Ly)
+    rho_new = np.zeros(Ly)
 
     sol = find_roots(func(beta,mu))
 
-    rho[:,0] = 0
-    rho[:,-1] = min(sol)
+    rho[0] = 0
+    rho[-1] = min(sol)
 
     while conv >= tol and cnt<count:
         cnt = cnt + 1
-        for i in range(Lx):
-            for j in range(1,Ly-1):
-                #Handle the periodic boundaries for x and y:
-                left = np.mod((i-1),Lx)
-                right = np.mod((i+1),Lx)
-                down = np.mod((j-1),Ly)
-                up = np.mod((j+1),Ly)
 
-                v_j = -beta_epsilon_wall*j**(-3)
-                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+        for j in range(1,Ly-1):
+            #Handle the periodic boundaries for x and y:
+            down = np.mod((j-1),Ly)
+            up = np.mod((j+1),Ly)
 
-        conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+            v_j = -epsilon_wall*j**(-3)
+            rho_new[j] = (1 - rho[j])*np.exp(beta*(3/2)*(rho[down] + rho[up]) + 2 * rho[j] + mu - v_j)
+
+        conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
         
-        rho[:,0] = 0
-        rho[:,-1] = min(sol)
+        rho[0] = 0
+        rho[-1] = min(sol)
+    
 
-    return rho[0]
+    # rho_0 = min(sol)
+    # rho = rho_0*np.ones(Ly)
+    # rho[0] = 0
+    # rho_new = np.zeros(Ly)
+    
+    # while conv >= tol and cnt<count:
+    #     cnt = cnt + 1
+
+    #     for j in range(Ly):
+            
+    #         if j == 0:
+    #             rho_new[j] = 0
+                
+    #         elif j == Ly-1:
+    #             rho_new[j] = rho_0
+                
+    #         else:
+    #             down = np.mod((j-1),Ly)
+    #             up = np.mod((j+1),Ly)
+
+    #             v_j = -epsilon_wall*j**(-3)
+    #             rho_new[j] = (1 - rho[j])*np.exp(beta*(3/2)*(rho[down] + rho[up]) + 2 * rho[j] + mu - v_j)
+
+    #     conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
+    #     rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        
+    #     rho[0] = 0
+        
+        
+    plt.plot(np.linspace(0, Ly, Ly), rho)
+
+    return rho
     
     
 
@@ -224,11 +253,12 @@ def plotproblem11():
 def main():
     # problem9()
 
-    mu = -2.67 # Chemical potential mu/epsilon
+    # mu = -2.67 # Chemical potential mu/epsilon
     
     # problem10(mu)
     
-    plotproblem11()
+    problem11(-2.67, 10)
+    # plotproblem11()
     
     plt.show()
 
