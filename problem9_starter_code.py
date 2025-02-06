@@ -1,7 +1,6 @@
 import scipy.optimize as sp
 import numpy as np
 import matplotlib.pyplot as plt
-import math 
 
 #Equation whose root defines the homogeneous equilibrium solutions:
 def func(beta,mu):
@@ -90,8 +89,9 @@ def problem9():
 
 
 
-Lx = 25 #Number of sites along x-axis
-Ly = 1 #Number of sites along y-axis
+Lx = 4 #Number of sites along x-axis
+Ly = 20 #Number of sites along y-axis
+
 beta = 1.2 #Inverse temperature beta*epsilon
 mu = -2.67 #Chemical potential mu/epsilon
 betaepsilonwall = 1.6
@@ -105,23 +105,27 @@ alpha  = 0.01 #Mixing parameter
 conv = 1
 cnt = 1
 rho = rho_0*np.ones([Lx,Ly])
-rho_new = np.zeros([Lx,Ly]);
+rho_new = np.zeros([Lx,Ly])
+
+sol = find_roots(func(beta,mu))
+print(sol)
+
 while conv >= tol and cnt<count:
   cnt = cnt + 1
   for i in range(Lx):
     for j in range(Ly):
       #Handle the periodic boundaries for x and y:
-      
+
       if i == 0:
           rho_new[i,j] = 0
-    
-      else:    
+
+      else:
           vj = -betaepsilonwall*i**(-3)
           print(vj)
-          left = np.mod((i-1),Lx) 
-          right = np.mod((i+1),Lx) 
-          down = np.mod((j-1),Ly) 
-          up = np.mod((j+1),Ly) 
+          left = np.mod((i-1),Lx)
+          right = np.mod((i+1),Lx)
+          down = np.mod((j-1),Ly)
+          up = np.mod((j+1),Ly)
           rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - vj))
 
 
@@ -145,23 +149,7 @@ plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ a
 
 plt.show()
 
-
-sol = find_roots(func(beta,mu))
-print(sol)
-
-
-
-
-
-
-
-
-
-
-
 def main():
     problem9()
-    
-
 
 # main()
