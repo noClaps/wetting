@@ -82,16 +82,11 @@ def problem9():
     print(rho[0,0])
     sol = find_roots(func(beta,mu))
     print(sol)
-
-
-
-
-
-
+    
 
 def problem10(mu):
-    Lx = 3 #Number of sites along x-axis
-    Ly = 12 #Number of sites along y-axis
+    Lx = 4 #Number of sites along x-axis
+    Ly = 20 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
     beta_epsilon_wall = 1.6
@@ -104,6 +99,7 @@ def problem10(mu):
     #Solve equations iteratively:
     conv = 1
     cnt = 1
+    global rho
     rho = rho_0*np.ones([Lx,Ly])
     rho_new = np.zeros([Lx,Ly])
 
@@ -127,9 +123,16 @@ def problem10(mu):
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        
+        rho[:,0] = 0
+        rho[:,-1] = min(sol)
+
+
 
     rho_t = rho.T
     rho_t[0, :] = math.inf
+    
+    
     plt.pcolor(rho_t, vmin=-1, vmax=1)
     cbar = plt.colorbar()
     cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
@@ -141,16 +144,92 @@ def problem10(mu):
     plt.xticks(np.linspace(0, Lx, Lx+1))
     plt.yticks(np.linspace(0, Ly, Ly+1))
     for (i, j), z in np.ndenumerate(rho):
-        plt.text(i+0.5, j+0.5, "{:0.1f}".format(z), ha="center", va="center")
+        plt.text(i+0.5, j+0.5, "{:0.1f}".format(z), ha="center", va="center", fontsize=6)
 
     plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
+
+
+def problem11(mu, Ly):
+    Lx = 1 #Number of sites along x-axis
+
+    beta = 1.2 #Inverse temperature beta*epsilon
+    beta_epsilon_wall = 1.6
+
+    rho_0 = 0.51 #Initial density
+    tol = 1e-12 #Convergence tolerance
+    count = 30000 #Upper limit for iterations
+    alpha  = 0.01 #Mixing parameter
+
+    #Solve equations iteratively:
+    conv = 1
+    cnt = 1
+    global rho
+    rho = rho_0*np.ones([Lx,Ly])
+    rho_new = np.zeros([Lx,Ly])
+
+    sol = find_roots(func(beta,mu))
+
+    rho[:,0] = 0
+    rho[:,-1] = min(sol)
+
+    while conv >= tol and cnt<count:
+        cnt = cnt + 1
+        for i in range(Lx):
+            for j in range(1,Ly-1):
+                #Handle the periodic boundaries for x and y:
+                left = np.mod((i-1),Lx)
+                right = np.mod((i+1),Lx)
+                down = np.mod((j-1),Ly)
+                up = np.mod((j+1),Ly)
+
+                v_j = -beta_epsilon_wall*j**(-3)
+                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+
+        conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        
+        rho[:,0] = 0
+        rho[:,-1] = min(sol)
+
+    return rho[0]
+    
+    
+
+    
+
+def plotproblem11():
+    Ly = 10
+    
+    rho1 = problem11(-2.67, Ly)
+    rho2 = problem11(-2.53, Ly)
+    
+    plt.plot(np.linspace(0, Ly, Ly), rho1, "blue", marker="o")
+    plt.plot(np.linspace(0, Ly, Ly), rho2, "red", marker="x")
+    
+    bulkrhopg = np.ones(3)*min(rho1[1:])
+    bulkrhopl = np.ones(3)*max(rho2)
+    plt.plot([0,1,2], bulkrhopg, color="black", linestyle="--")
+    plt.plot([0,1,2], bulkrhopl, color="black", linestyle="--")
+    
+    
+    plt.legend([r"$\mu/\epsilon$ = -2.67", r"$\mu/\epsilon$ = -2.53"])
+
+    plt.xlabel(r"Lattice points $y/\sigma$")
+    plt.ylabel(r"Density $\rho\sigma^2$")
+
+    plt.title("Density profiles close to the wall")
+
 
 
 def main():
     # problem9()
 
     mu = -2.67 # Chemical potential mu/epsilon
-    problem10(mu)
+    
+    # problem10(mu)
+    
+    plotproblem11()
+    
     plt.show()
 
 main()
