@@ -85,9 +85,81 @@ def problem9():
 
 
 
+
+
+
+
+Lx = 12 #Number of sites along x-axis
+Ly = 20 #Number of sites along y-axis
+beta = 1 #Inverse temperature beta*epsilon
+mu = -3.5 #Chemical potential mu/epsilon
+betaepsilonwall = 1.6
+
+rho_0 = 0.51 #Initial density
+tol = 1e-12 #Convergence tolerance
+count = 30000 #Upper limit for iterations
+alpha  = 0.01 #Mixing parameter
+
+#Solve equations iteratively:
+conv = 1
+cnt = 1
+rho = rho_0*np.ones([Lx,Ly])
+rho_new = np.zeros([Lx,Ly]);
+while conv >= tol and cnt<count:
+  cnt = cnt + 1
+  for i in range(Lx):
+    for j in range(Ly):
+      #Handle the periodic boundaries for x and y:
+      
+      if i == 0:
+          rho_new[i,j] = -1
+    
+      else:    
+          left = np.mod((i-1),Lx) 
+          right = np.mod((i+1),Lx) 
+          down = np.mod((j-1),Ly) 
+          up = np.mod((j+1),Ly) 
+          rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu)) -betaepsilonwall*i**(-3)
+
+
+
+  conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+  rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+
+plt.imshow(rho, extent=(0, Lx, 0, Ly), vmin=-1, vmax=1)
+cbar = plt.colorbar()
+cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
+
+plt.xlabel("Lattice points")
+plt.ylabel("Lattice points")
+
+plt.grid(True, linestyle="--")
+plt.xticks(np.linspace(0, Lx, Lx+1))
+plt.yticks(np.linspace(0, Ly, Ly+1))
+for (i, j), z in np.ndenumerate(rho):
+    plt.text(i+0.5, j+0.5, "{:0.1f}".format(z), ha="center", va="center")
+
+plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
+
+plt.show()
+
+
+sol = find_roots(func(beta,mu))
+print(sol)
+
+
+
+
+
+
+
+
+
+
+
 def main():
     problem9()
     
 
 
-main()
+# main()
