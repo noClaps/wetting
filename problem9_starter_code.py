@@ -89,8 +89,8 @@ def problem9():
 
 
 
-Lx = 4 #Number of sites along x-axis
-Ly = 20 #Number of sites along y-axis
+Lx = 3 #Number of sites along x-axis
+Ly = 12 #Number of sites along y-axis
 
 beta = 1.2 #Inverse temperature beta*epsilon
 mu = -2.67 #Chemical potential mu/epsilon
@@ -108,25 +108,24 @@ rho = rho_0*np.ones([Lx,Ly])
 rho_new = np.zeros([Lx,Ly])
 
 sol = find_roots(func(beta,mu))
-print(sol)
+
+rho[:,0] = 0
+rho[:,-1] = min(sol)
 
 while conv >= tol and cnt<count:
   cnt = cnt + 1
   for i in range(Lx):
-    for j in range(Ly):
+    for j in range(1,Ly-1):
       #Handle the periodic boundaries for x and y:
 
-      if i == 0:
-          rho_new[i,j] = 0
-
-      else:
-          vj = -betaepsilonwall*i**(-3)
-          print(vj)
-          left = np.mod((i-1),Lx)
-          right = np.mod((i+1),Lx)
-          down = np.mod((j-1),Ly)
-          up = np.mod((j+1),Ly)
-          rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - vj))
+      left = np.mod((i-1),Lx)
+      right = np.mod((i+1),Lx)
+      down = np.mod((j-1),Ly)
+      up = np.mod((j+1),Ly)
+      
+      vj = -betaepsilonwall*j**(-3)
+      rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - vj))
+          
 
 
   conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
