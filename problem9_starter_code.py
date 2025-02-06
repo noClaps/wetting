@@ -149,6 +149,9 @@ def problem10(mu):
     plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
 
 
+
+
+
 def problem11(mu, Ly):
 
     beta = 1.2 #Inverse temperature beta*epsilon
@@ -216,13 +219,44 @@ def problem11(mu, Ly):
     #     rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
         
     #     rho[0] = 0
+    
+    
+    
         
         
     plt.plot(np.linspace(0, Ly, Ly), rho)
 
     return rho
     
+
+def wall_solver_1D(Ly,beta,mu,rho_0,tol,count,alpha,eps_w,gas_bulk):
+    conv = 1
+    cnt = 1
+    rho = rho_0*np.ones(Ly)
+    rho[0] = 0
+    rho_new = np.zeros(Ly);
+    while conv >= tol and cnt<count:
+        for j in range(Ly):
+            #Handle the periodic boundaries for x and y:
+            down = np.mod((j-1),Ly) #j-1, maps -1 to Ly-1
+            up = np.mod((j+1),Ly) #j+1, maps Ly to 0
+            if j == Ly - 1:
+                rho_new[j] = gas_bulk
+            elif j == 0:
+                rho_new[j] = 0
+            else:
+                rho_new[j] = (1 - rho[j])*np.exp(beta*((3/2)*(rho[down] + rho[up]) + 2*rho[j] + mu + eps_w*(j)**(-3)))
     
+        conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
+        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        cnt = cnt + 1
+        
+    plt.plot(np.linspace(0, Ly, Ly), rho)
+
+        
+        
+    return np.array(rho)
+
 
     
 
@@ -257,8 +291,18 @@ def main():
     
     # problem10(mu)
     
-    problem11(-2.67, 10)
+    # problem11(-2.67, 10)
     # plotproblem11()
+    Ly = 10
+    beta =1.2
+    mu =-2.67
+    rho_0 =0.51
+    tol = 1e-12 #Convergence tolerance
+    count = 30000 #Upper limit for iterations
+    alpha  = 0.01 #Mixing parameter
+    eps_w = 4/3
+    gas_bulk = min(find_roots(func(beta,mu)))
+    wall_solver_1D(Ly,beta,mu,rho_0,tol,count,alpha,eps_w,gas_bulk)
     
     plt.show()
 
