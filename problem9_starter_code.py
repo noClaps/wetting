@@ -1,6 +1,7 @@
 import scipy.optimize as sp
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 #Equation whose root defines the homogeneous equilibrium solutions:
 def func(beta,mu):
@@ -94,7 +95,7 @@ Ly = 12 #Number of sites along y-axis
 
 beta = 1.2 #Inverse temperature beta*epsilon
 mu = -2.67 #Chemical potential mu/epsilon
-betaepsilonwall = 1.6
+beta_epsilon_wall = 1.6
 
 rho_0 = 0.51 #Initial density
 tol = 1e-12 #Convergence tolerance
@@ -122,16 +123,18 @@ while conv >= tol and cnt<count:
       right = np.mod((i+1),Lx)
       down = np.mod((j-1),Ly)
       up = np.mod((j+1),Ly)
-      
-      vj = -betaepsilonwall*j**(-3)
-      rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - vj))
-          
+
+      v_j = -beta_epsilon_wall*j**(-3)
+      rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+
 
 
   conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
   rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
-plt.imshow(rho, extent=(0, Lx, 0, Ly))
+rho_t = rho.T
+rho_t[0, :] = math.inf
+plt.pcolor(rho_t, vmin=-1, vmax=1)
 cbar = plt.colorbar()
 cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
