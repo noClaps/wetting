@@ -113,7 +113,8 @@ def phase_density(num_samples = 100):
 
     leftline = kBTe*np.log(rho1/rho2) - 5*rho1
     rightline = kBTe*np.log(rho2/rho1) - 5*rho2
-    centreline = np.ones(100)*(-5/2)
+    centreline = np.ones(num_samples)*(-5/2)
+    criticaltempline = np.ones(num_samples)*1.25
 
     fig3, ax3 = plt.subplots(figsize=(8,6))
 
@@ -122,6 +123,7 @@ def phase_density(num_samples = 100):
     plt.plot(leftline, kBTe, "blue", linewidth=4)
     plt.plot(rightline, kBTe, "blue", linewidth=4)
     plt.plot(centreline, kBTe, "red", linewidth=3)
+    plt.plot(np.linspace(-5, 0, num_samples), criticaltempline, color="black", linestyle="--", linewidth=2)
 
     plt.xlabel(r"$\mu / \epsilon$")
     plt.ylabel(r"$k_BT/\epsilon$")
@@ -130,8 +132,8 @@ def phase_density(num_samples = 100):
     cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
 def main():
-    plotroots()
-    chem_pot_func()
+    # plotroots()
+    # chem_pot_func()
     phase_density()
     plt.show()
 
