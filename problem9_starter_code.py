@@ -151,10 +151,10 @@ def problem10(mu):
 
 
 
-def problem11(mu, Ly):
+def problem11(mu, Ly, beta_epsilon_wall = 1.6):
 
     beta = 1.2 #Inverse temperature beta*epsilon
-    epsilon_wall = 4/3
+    epsilon_wall = beta_epsilon_wall / beta
 
     rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
@@ -188,14 +188,14 @@ def problem11(mu, Ly):
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
         cnt = cnt + 1
 
-    return rho
+    return rho, gas_bulk
     
 
 def plotproblem11():
     Ly = 10
     
-    rho1 = problem11(-2.67, Ly)
-    rho2 = problem11(-2.53, Ly)
+    rho1,_ = problem11(-2.67, Ly)
+    rho2,_ = problem11(-2.53, Ly)
     
     plt.plot(np.linspace(0, Ly, Ly), rho1, "blue", marker="o")
     plt.plot(np.linspace(0, Ly, Ly), rho2, "red", marker="x")
@@ -215,13 +215,68 @@ def plotproblem11():
     plt.show()
 
 
-def problem12():
-    # rhog = phase_density()
-    rhoi = problem11(-2.53,20)
+def problem12(beta_eps_wall):
+
+    num_vals = 20
+
+
+    mu_coex = -2.5
+    mu_vals = np.linspace(-2.8, mu_coex - 0.01, num_vals)
     
-    Gamma = sum(rhoi - rhog)
-    print(Gamma)
+    Gamma = np.zeros(num_vals)
     
+    for i, mu in enumerate(mu_vals):
+        rhoi, rhog = problem11(mu, num_vals, beta_eps_wall)
+        Gamma[i] = sum(rhoi - rhog)
+
+
+    return Gamma
+    
+    
+def plotproblem12():
+    
+    num_vals = 20
+    mu_coex = -2.5
+    
+    
+    
+    # beta_vals = [0.5, 2.0]
+    # for beta in beta_vals:
+    #     Gamma = problem12(beta)
+    #     plt.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma)
+    #     plt.legend([r"$\beta\epsilon_w$ = {beta}"])
+    
+    # plt.xlabel(r"$\beta (\mu - \mu_{coex})$")
+    # plt.ylabel(rf"Adsoption $\Gamma$")   
+
+    # plt.title("Adsorption at the wall")
+    # plt.show()
+    
+    
+    fig2, ax2 = plt.subplots()
+    legends = []
+    
+    
+    beta_vals_low = [0.5, 1.1, 1.2]
+    for beta in beta_vals_low:
+        Gamma2 = problem12(beta)
+        ax2.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma2)
+        legends.append(rf"$\beta\epsilon_w$ = {beta}")
+    
+
+        
+    beta_vals_high = [1.3, 1.6, 2.0]
+    for beta in beta_vals_high:
+        Gamma2 = problem12(beta)
+        ax2.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma2)
+        legends.append(rf"$\beta\epsilon_w$ = {beta}")
+    
+    
+    ax2.legend(legends)
+    ax2.set_xlabel(r"$\beta (\mu - \mu_{coex})$")
+    ax2.set_ylabel(r"Adsoption $\Gamma$")   
+
+    ax2.set_title("Adsorption at the wall")
     
 
 
@@ -234,7 +289,8 @@ def main():
     
     # plotproblem11()
     
-    problem12()
+    # problem12()
+    plotproblem12()
     
 
 
