@@ -1,6 +1,3 @@
-
-
-
 import scipy.optimize as sp
 import numpy as np
 import matplotlib
@@ -20,7 +17,7 @@ def func7(beta,mu):
 def find_roots7(f):
   roots = []
   # Compute a root over the entire range [0,1]
-  sol = sp.optimize.brentq(f,0,1) #Use Brent's method - will find smallest root
+  sol = sp.brentq(f,0,1) #Use Brent's method - will find smallest root
   roots.append(sol)
 
   # Find if there are any other roots by using intervals above this solution
@@ -139,9 +136,9 @@ def phase_density7(num_samples = 100, density_limit = -1):
     # plt.show()
     return densities
 
-    
-    
-    
+
+
+
 #Equation whose root defines the homogeneous equilibrium solutions:
 def func(beta,mu):
     return lambda rho : rho-(1.0-rho)*np.exp(beta*(mu+5.0*rho))
@@ -219,7 +216,7 @@ def problem9():
     # plt.show()
 
     return rho
-    
+
 
 def problem10(mu):
     Lx = 4 #Number of sites along x-axis
@@ -260,7 +257,7 @@ def problem10(mu):
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
-        
+
         rho[:,0] = 0
         rho[:,-1] = min(sol)
 
@@ -268,8 +265,8 @@ def problem10(mu):
 
     rho_t = rho.T
     rho_t[0, :] = math.inf
-    
-    
+
+
     plt.pcolor(rho_t, vmin=-1, vmax=1)
     cbar = plt.colorbar()
     cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
@@ -289,10 +286,10 @@ def problem10(mu):
 
 
 
-def problem11(mu, Ly):
+def problem11(mu, Ly, beta_epsilon_wall = 1.6):
 
     beta = 1.2 #Inverse temperature beta*epsilon
-    epsilon_wall = 4/3
+    epsilon_wall = beta_epsilon_wall / beta
 
     rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
@@ -302,14 +299,14 @@ def problem11(mu, Ly):
 
     conv = 1
     cnt = 1
-    
+
     gas_bulk = min(find_roots(func(beta,mu)))
-    
+
     rho = rho_0*np.ones(Ly)
     rho[0] = 0
     rho_new = np.zeros(Ly);
-    
-    
+
+
     while conv >= tol and cnt<count:
         for j in range(Ly):
             #Handle the periodic boundaries for x and y:
@@ -321,29 +318,29 @@ def problem11(mu, Ly):
                 rho_new[j] = 0
             else:
                 rho_new[j] = (1 - rho[j])*np.exp(beta*((3/2)*(rho[down] + rho[up]) + 2*rho[j] + mu + epsilon_wall*(j)**(-3)))
-    
+
         conv = sum((rho - rho_new)**2); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
         cnt = cnt + 1
 
-    return rho
-    
+    return rho, gas_bulk
+
 
 def plotproblem11():
     Ly = 10
-    
+
     rho1 = problem11(-2.67, Ly)
-    rho2 = problem11(-2.53, Ly)
-    
+    rho2, _ = problem11(-2.53, Ly)
+
     plt.plot(np.linspace(0, Ly, Ly), rho1, "blue", marker="o")
     plt.plot(np.linspace(0, Ly, Ly), rho2, "red", marker="x")
-    
+
     bulkrhopg = np.ones(3)*min(rho1[1:])
     bulkrhopl = np.ones(3)*max(rho2)
     plt.plot([0,1,2], bulkrhopg, color="black", linestyle="--")
     plt.plot([0,1,2], bulkrhopl, color="black", linestyle="--")
-    
-    
+
+
     plt.legend([r"$\mu/\epsilon$ = -2.67", r"$\mu/\epsilon$ = -2.53"])
 
     plt.xlabel(r"Lattice points $y/\sigma$")
@@ -356,32 +353,36 @@ def plotproblem11():
 def problem12():
     # rhogmatrix = phase_density7(20,0)
     # rhog = rhogmatrix[11]
-    
-    rhogroots
-    
-    
-    rhoi = problem11(-2.53,20)
-    
-    Gamma = sum(rhoi - rhog)
+    num_vals = 20
 
-    print(Gamma)
-    
-    
-    
+    mu_coex = -2.5
+    beta_eps_wall = 2
+    mu_vals = np.linspace(-2.8, mu_coex, num_vals)
+
+    problem11_vals = [problem11(mu-mu_coex, num_vals, beta_eps_wall) for mu in mu_vals]
+    # print(problem11_vals[0][0] - problem11_vals[0][1])
+    Gamma = [np.sum(rhoi - rhog) for rhoi, rhog in problem11_vals]
+    # print(Gamma)
+
+    plt.plot(mu_vals-mu_coex, Gamma)
+    plt.show()
+
+
+
 
 
 def main():
-    
+
     # plotroots7()
     # chem_pot_func7()
     # phase_density7()
-    
+
     # problem9()
     # problem10(-2.53)
     # plotproblem11()
     problem12()
-    
-    
-    
+
+
+
 if __name__ == "__main__":
     main()
