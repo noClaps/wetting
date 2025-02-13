@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+
 #Equation whose root defines the homogeneous equilibrium solutions:
 def func(beta,mu):
     return lambda rho : rho-(1.0-rho)*np.exp(beta*(mu+5.0*rho))
@@ -62,26 +63,24 @@ def problem9():
       conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
       rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
-    plt.imshow(rho, extent=(0, Lx, 0, Ly), vmin=-1, vmax=1)
-    cbar = plt.colorbar()
-    cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
+    # plt.imshow(rho, extent=(0, Lx, 0, Ly), vmin=-1, vmax=1)
+    # cbar = plt.colorbar()
+    # cbar.set_label(r"Density $\rho$", rotation=270, labelpad=20)
 
-    plt.xlabel("Lattice points")
-    plt.ylabel("Lattice points")
+    # plt.xlabel("Lattice points")
+    # plt.ylabel("Lattice points")
 
-    plt.grid(True, linestyle="--")
-    plt.xticks(np.linspace(0, Lx, Lx+1))
-    plt.yticks(np.linspace(0, Ly, Ly+1))
-    for (i, j), z in np.ndenumerate(rho):
-        plt.text(j+0.5, i+0.5, "{:0.3f}".format(z), ha="center", va="center")
+    # plt.grid(True, linestyle="--")
+    # plt.xticks(np.linspace(0, Lx, Lx+1))
+    # plt.yticks(np.linspace(0, Ly, Ly+1))
+    # for (i, j), z in np.ndenumerate(rho):
+    #     plt.text(j+0.5, i+0.5, "{:0.3f}".format(z), ha="center", va="center")
 
-    plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
+    # plt.title(rf"Equilibrium potential of {Lx}x{Ly} 2D lattice with $\beta={beta}$ and $\mu={mu}$")
 
-    plt.show()
+    # plt.show()
 
-    print(rho[0,0])
-    sol = find_roots(func(beta,mu))
-    print(sol)
+    return rho
     
 
 def problem10(mu):
@@ -216,6 +215,15 @@ def plotproblem11():
     plt.show()
 
 
+def problem12():
+    # rhog = phase_density()
+    rhoi = problem11(-2.53,20)
+    
+    Gamma = sum(rhoi - rhog)
+    print(Gamma)
+    
+    
+
 
 def main():
     # problem9()
@@ -224,7 +232,9 @@ def main():
     # problem10(-2.53)
 
     
-    plotproblem11()
+    # plotproblem11()
+    
+    problem12()
     
 
 
