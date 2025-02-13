@@ -169,7 +169,7 @@ def problem11(mu, Ly, beta_epsilon_wall = 1.6):
 
     gas_bulk = min(find_roots(func(beta,mu)))
 
-    rho = rho_0*np.ones(Ly)
+    rho = rho_0*np.ones(Ly)*gas_bulk
     rho[0] = 0
     rho_new = np.zeros(Ly);
 
@@ -341,12 +341,12 @@ def main():
 
     # problem12()
 
-    # P12_beta_vals = [0.5, 2.0]
+    P12_beta_vals = [0.5, 2.0]
     # # P13_beta_vals = [1.6, 1.7, 1.8]
     # # P13_beta_vals16 = [1.6]
-    # plotproblem12(P12_beta_vals)
+    plotproblem12(P12_beta_vals)
 
-    problem14(2.0)
+    # problem14(2.0)
 
 
 
