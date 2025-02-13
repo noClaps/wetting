@@ -233,51 +233,97 @@ def problem12(beta_eps_wall):
     return Gamma
     
     
-def plotproblem12():
+def plotproblem12(beta_vals):
     
     num_vals = 20
     mu_coex = -2.5
     
+    legend = []
     
-    
-    # beta_vals = [0.5, 2.0]
-    # for beta in beta_vals:
-    #     Gamma = problem12(beta)
-    #     plt.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma)
-    #     plt.legend([r"$\beta\epsilon_w$ = {beta}"])
-    
-    # plt.xlabel(r"$\beta (\mu - \mu_{coex})$")
-    # plt.ylabel(rf"Adsoption $\Gamma$")   
-
-    # plt.title("Adsorption at the wall")
-    # plt.show()
-    
-    
-    fig2, ax2 = plt.subplots()
-    legends = []
-    
-    
-    beta_vals_low = [0.5, 1.1, 1.2]
-    for beta in beta_vals_low:
-        Gamma2 = problem12(beta)
-        ax2.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma2)
-        legends.append(rf"$\beta\epsilon_w$ = {beta}")
-    
-
+    for beta in beta_vals:
+        Gamma = problem12(beta)
+        plt.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma)
+        legend.append(rf"$\beta\epsilon_w$ = {beta}")
         
-    beta_vals_high = [1.3, 1.6, 2.0]
-    for beta in beta_vals_high:
-        Gamma2 = problem12(beta)
-        ax2.plot(np.linspace(-2.8 - mu_coex, 0, num_vals), Gamma2)
-        legends.append(rf"$\beta\epsilon_w$ = {beta}")
+    plt.legend(legend)
     
-    
-    ax2.legend(legends)
-    ax2.set_xlabel(r"$\beta (\mu - \mu_{coex})$")
-    ax2.set_ylabel(r"Adsoption $\Gamma$")   
+    plt.xlabel(r"$\beta (\mu - \mu_{coex})$")
+    plt.ylabel(r"Adsoption $\Gamma$")   
 
-    ax2.set_title("Adsorption at the wall")
+    plt.title("Adsorption at the wall")
+    plt.show()
     
+
+
+
+
+
+def problem14(beta_epsilon_wall):
+    Lx = 4 #Number of sites along x-axis
+    Ly = 10 #Number of sites along y-axis
+
+    beta = 1.2 #Inverse temperature beta*epsilon
+    epsilon_wall = beta_epsilon_wall / beta
+    
+    mu = -5/2
+
+    rho_0 = 0.51 #Initial density
+    tol = 1e-12 #Convergence tolerance
+    count = 30000 #Upper limit for iterations
+    alpha  = 0.01 #Mixing parameter
+
+    #Solve equations iteratively:
+    conv = 1
+    cnt = 1
+    
+    
+    minsol = min(find_roots(func(beta,mu)))
+    maxsol = max(find_roots(func(beta,mu)))
+    
+    global rho
+    rho = rho_0*np.ones([Lx,Ly])*minsol
+    rho[:,0] = maxsol
+    
+    rho_new = np.zeros([Lx,Ly])
+
+
+
+
+    while conv >= tol and cnt<count:
+        cnt = cnt + 1
+        for i in range(Lx):
+            for j in range(1,Ly-1):
+                #Handle the periodic boundaries for x and y:
+                left = np.mod((i-1),Lx)
+                right = np.mod((i+1),Lx)
+                down = np.mod((j-1),Ly)
+                up = np.mod((j+1),Ly)
+
+                v_j = -epsilon_wall*j**(-3)
+                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+
+        conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        
+        rho[:,0] = maxsol
+        rho[:,-1] = minsol
+
+
+
+    rho_t = rho.T
+    rho_t[0, :] = 0
+    
+    
+    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = "gnuplot")
+    cbar = plt.colorbar()
+    cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
+
+    plt.xlabel(r"Lattice points $x/\sigma$")
+    plt.ylabel(r"Lattice points $y/\sigma$")
+
+    plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
+
+    plt.plot()
 
 
 def main():
@@ -290,7 +336,13 @@ def main():
     # plotproblem11()
     
     # problem12()
-    plotproblem12()
+    
+    # P12_beta_vals = [0.5, 2.0]
+    # # P13_beta_vals = [1.6, 1.7, 1.8]
+    # # P13_beta_vals16 = [1.6]
+    # plotproblem12(P12_beta_vals)
+    
+    problem14(2.0)
     
 
 
