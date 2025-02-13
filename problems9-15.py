@@ -284,7 +284,7 @@ def problem14(beta_epsilon_wall):
     global rho
     rho = np.ones([Lx,Ly])*minsol
 
-    
+
     shape = np.ones([30,20])*maxsol
     num_particles = 30*20
     rho[34:64,1:21] = shape
@@ -293,6 +293,8 @@ def problem14(beta_epsilon_wall):
 
     rho_initial = rho
     rho_new = np.zeros([Lx,Ly])
+
+    fancy_N = num_particles * 1/np.sum(rho)
 
 
 
@@ -310,7 +312,10 @@ def problem14(beta_epsilon_wall):
                 v_j = -epsilon_wall*j**(-3)
                 rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
 
-                
+                new_fancy_N = num_particles * 1/np.sum(rho_new)
+                if new_fancy_N != fancy_N:
+                    print(new_fancy_N)
+                    break
 
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
@@ -318,7 +323,6 @@ def problem14(beta_epsilon_wall):
 
         rho[:,0] = maxsol
         rho[:,-1] = minsol
-
 
 
     rho_t = rho.T
