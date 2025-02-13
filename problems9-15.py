@@ -261,8 +261,8 @@ def plotproblem12(beta_vals):
 
 
 def problem14(beta_epsilon_wall):
-    Lx = 4 #Number of sites along x-axis
-    Ly = 10 #Number of sites along y-axis
+    Lx = 100 #Number of sites along x-axis
+    Ly = 40 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
     epsilon_wall = beta_epsilon_wall / beta
@@ -283,8 +283,15 @@ def problem14(beta_epsilon_wall):
 
     global rho
     rho = np.ones([Lx,Ly])*minsol
+
+    
+    shape = np.ones([30,20])*maxsol
+    num_particles = 30*20
+    rho[34:64,1:21] = shape
     rho[:,0] = maxsol
 
+
+    rho_initial = rho
     rho_new = np.zeros([Lx,Ly])
 
 
@@ -302,6 +309,9 @@ def problem14(beta_epsilon_wall):
 
                 v_j = -epsilon_wall*j**(-3)
                 rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
+
+                
+
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
