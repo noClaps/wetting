@@ -267,9 +267,8 @@ def problem14(beta_epsilon_wall):
     beta = 1.2 #Inverse temperature beta*epsilon
     epsilon_wall = beta_epsilon_wall / beta
 
-    mu = -5/2
+    mu_coex = -5/2
 
-    rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
     count = 30000 #Upper limit for iterations
     alpha  = 0.01 #Mixing parameter
@@ -279,11 +278,11 @@ def problem14(beta_epsilon_wall):
     cnt = 1
 
 
-    minsol = min(find_roots(func(beta,mu)))
-    maxsol = max(find_roots(func(beta,mu)))
+    minsol = min(find_roots(func(beta,mu_coex)))
+    maxsol = max(find_roots(func(beta,mu_coex)))
 
     global rho
-    rho = rho_0*np.ones([Lx,Ly])*minsol
+    rho = np.ones([Lx,Ly])*minsol
     rho[:,0] = maxsol
 
     rho_new = np.zeros([Lx,Ly])
@@ -302,7 +301,7 @@ def problem14(beta_epsilon_wall):
                 up = np.mod((j+1),Ly)
 
                 v_j = -epsilon_wall*j**(-3)
-                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu - v_j))
+                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
