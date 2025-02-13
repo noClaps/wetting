@@ -341,12 +341,15 @@ def main():
 
     # problem12()
 
-    P12_beta_vals = [0.5, 2.0]
-    # # P13_beta_vals = [1.6, 1.7, 1.8]
-    # # P13_beta_vals16 = [1.6]
-    plotproblem12(P12_beta_vals)
+    # P12_beta_vals = [0.5, 2.0]
+    # plotproblem12(P12_beta_vals)
 
-    # problem14(2.0)
+    # P13_beta_vals = [1.6, 1.7, 1.8]
+    # P13_beta_vals16 = [1.6]
+    # plotproblem12(P13_beta_vals)
+    # plotproblem12(P13_beta_vals16)
+
+    problem14(0.5)
 
 
 
