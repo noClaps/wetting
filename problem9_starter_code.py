@@ -315,10 +315,10 @@ def problem14(beta_epsilon_wall):
     rho_t = rho.T
     rho_t[0, :] = 0
     
-    YlGnBu_big = cm.get_cmap("jet", 512)
-    YlBu = ListedColormap(YlGnBu_big(np.linspace(0.2, 0.65, 256)))
+    jet_cmap = cm.get_cmap("jet", 512)
+    piss_cmap = ListedColormap(jet_cmap(np.linspace(0.2, 0.65, 256)))
     
-    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = YlBu)
+    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = piss_cmap)
     cbar = plt.colorbar()
     cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
 
