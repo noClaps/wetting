@@ -2,6 +2,8 @@ import scipy.optimize as sp
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+from matplotlib import cm
+from matplotlib.colors import ListedColormap
 
 
 #Equation whose root defines the homogeneous equilibrium solutions:
@@ -313,8 +315,10 @@ def problem14(beta_epsilon_wall):
     rho_t = rho.T
     rho_t[0, :] = 0
     
+    YlGnBu_big = cm.get_cmap("jet", 512)
+    YlBu = ListedColormap(YlGnBu_big(np.linspace(0.2, 0.65, 256)))
     
-    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = "gnuplot")
+    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = YlBu)
     cbar = plt.colorbar()
     cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
 
