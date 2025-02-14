@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 from matplotlib import pyplot
 from matplotlib.colors import ListedColormap
+import polars as pl
 
 
 #Equation whose root defines the homogeneous equilibrium solutions:
@@ -270,17 +271,17 @@ def problem14(beta_epsilon_wall):
     Ly = 20 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
-    epsilon_wall = beta_epsilon_wall / beta
+    # epsilon_wall = beta_epsilon_wall / beta
 
     mu_coex = -5/2
 
-    tol = 1e-12 #Convergence tolerance
-    count = 30000 #Upper limit for iterations
-    alpha  = 0.01 #Mixing parameter
+    # tol = 1e-12 #Convergence tolerance
+    # count = 30000 #Upper limit for iterations
+    # alpha  = 0.01 #Mixing parameter
 
-    #Solve equations iteratively:
-    conv = 1
-    cnt = 1
+    # # Solve equations iteratively:
+    # conv = 1
+    # cnt = 1
 
 
     minsol = min(find_roots(func(beta,mu_coex)))
@@ -298,43 +299,35 @@ def problem14(beta_epsilon_wall):
 
 
     rho_initial = rho.T
-    rho_new = np.zeros([Lx,Ly])
+    # rho_new = np.zeros([Lx,Ly])
+
+    # while conv >= tol and cnt<count:
+    #     cnt = cnt + 1
+    #     for i in range(Lx):
+    #         for j in range(1,Ly-1):
+    #             #Handle the periodic boundaries for x and y:
+    #             left = np.mod((i-1),Lx)
+    #             right = np.mod((i+1),Lx)
+    #             down = np.mod((j-1),Ly)
+    #             up = np.mod((j+1),Ly)
+
+    #             v_j = -epsilon_wall*j**(-3)
+    #             rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
 
 
+    #     conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
+    #     rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
 
+    #     # Normalization step
+    #     N = np.sum(rho_initial)
+    #     N_current = np.sum(rho)
+    #     rho *= N / N_current
 
+    #     rho[:, 0] = 0
+    #     rho[:, -1] = minsol
+    # rho = rho.T
 
-
-
-
-    while conv >= tol and cnt<count:
-        cnt = cnt + 1
-        for i in range(Lx):
-            for j in range(1,Ly-1):
-                #Handle the periodic boundaries for x and y:
-                left = np.mod((i-1),Lx)
-                right = np.mod((i+1),Lx)
-                down = np.mod((j-1),Ly)
-                up = np.mod((j+1),Ly)
-
-                v_j = -epsilon_wall*j**(-3)
-                rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
-
-
-        conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
-        rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
-
-        # Normalization step
-        N = np.sum(rho_initial)
-        N_current = np.sum(rho)
-        rho *= N / N_current
-
-        rho[:, 0] = 0
-        rho[:, -1] = minsol
-    rho = rho.T
-
-
-
+    rho = pl.read_csv("./problem14.csv", has_header=False)
 
 
     jet_cmap = pyplot.get_cmap("jet")
