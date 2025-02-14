@@ -267,8 +267,8 @@ def plotproblem12(beta_vals):
 
 
 def problem14(beta_epsilon_wall):
-    Lx = 20 #Number of sites along x-axis
-    Ly = 20 #Number of sites along y-axis
+    Lx = 100 #Number of sites along x-axis
+    Ly = 40 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
     # epsilon_wall = beta_epsilon_wall / beta
@@ -290,8 +290,8 @@ def problem14(beta_epsilon_wall):
     global rho
     rho = np.ones([Lx,Ly])*minsol
 
-    squarewidth = 8
-    squareheight = 6
+    squarewidth = 30
+    squareheight = 20
     shape = np.ones([squarewidth, squareheight])*maxsol
     rho[int(Lx/2) - int(squarewidth/2) : int(Lx/2) + int(squarewidth/2), 1 : squareheight + 1] = shape
 
