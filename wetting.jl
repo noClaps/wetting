@@ -69,4 +69,4 @@ function problem14(beta_epsilon_wall)
     writedlm("problem14.csv", rho, ",")
 end
 
-problem14(0.5)
+problem14(2.0)
