@@ -2,7 +2,7 @@ import scipy.optimize as sp
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from matplotlib import cm
+from matplotlib import pyplot
 from matplotlib.colors import ListedColormap
 
 
@@ -153,12 +153,11 @@ def problem10(mu):
 
 
 
-def problem11(mu, Ly, beta_epsilon_wall = 1.6):
+def problem11(mu, Ly, beta_epsilon_wall):
 
     beta = 1.2 #Inverse temperature beta*epsilon
     epsilon_wall = beta_epsilon_wall / beta
 
-    rho_0 = 0.51 #Initial density
     tol = 1e-12 #Convergence tolerance
     count = 30000 #Upper limit for iterations
     alpha  = 0.01 #Mixing parameter
@@ -169,7 +168,7 @@ def problem11(mu, Ly, beta_epsilon_wall = 1.6):
 
     gas_bulk = min(find_roots(func(beta,mu)))
 
-    rho = rho_0*np.ones(Ly)*gas_bulk
+    rho = np.ones(Ly)*gas_bulk
     rho[0] = 0
     rho_new = np.zeros(Ly);
 
@@ -196,11 +195,13 @@ def problem11(mu, Ly, beta_epsilon_wall = 1.6):
 def plotproblem11():
     Ly = 10
 
-    rho1,_ = problem11(-2.67, Ly)
-    rho2,_ = problem11(-2.53, Ly)
+    rho1,_ = problem11(-2.67, Ly, 1.6)
+    rho2,_ = problem11(-2.53, Ly, 1.6)
+    
 
     plt.plot(np.linspace(0, Ly, Ly), rho1, "blue", marker="o")
     plt.plot(np.linspace(0, Ly, Ly), rho2, "red", marker="x")
+    
 
     bulkrhopg = np.ones(3)*min(rho1[1:])
     bulkrhopl = np.ones(3)*max(rho2)
@@ -215,6 +216,10 @@ def plotproblem11():
 
     plt.title("Density profiles close to the wall")
     plt.show()
+    
+    
+    
+
 
 
 def problem12(beta_eps_wall):
@@ -261,8 +266,8 @@ def plotproblem12(beta_vals):
 
 
 def problem14(beta_epsilon_wall):
-    Lx = 100 #Number of sites along x-axis
-    Ly = 40 #Number of sites along y-axis
+    Lx = 20 #Number of sites along x-axis
+    Ly = 20 #Number of sites along y-axis
 
     beta = 1.2 #Inverse temperature beta*epsilon
     epsilon_wall = beta_epsilon_wall / beta
@@ -284,17 +289,20 @@ def problem14(beta_epsilon_wall):
     global rho
     rho = np.ones([Lx,Ly])*minsol
 
+    squarewidth = 8
+    squareheight = 6
+    shape = np.ones([squarewidth, squareheight])*maxsol
+    rho[int(Lx/2) - int(squarewidth/2) : int(Lx/2) + int(squarewidth/2), 1 : squareheight + 1] = shape
+    
+    rho[:,0] = 0
 
-    shape = np.ones([30,20])*maxsol
-    num_particles = 30*20
-    rho[34:64,1:21] = shape
-    rho[:,0] = maxsol
 
-
-    rho_initial = rho
+    rho_initial = rho.T
     rho_new = np.zeros([Lx,Ly])
 
-    fancy_N = num_particles * 1/np.sum(rho)
+
+    
+
 
 
 
@@ -312,35 +320,82 @@ def problem14(beta_epsilon_wall):
                 v_j = -epsilon_wall*j**(-3)
                 rho_new[i,j] = (1 - rho[i,j])*np.exp(beta*(rho[i,down] + rho[i,up] + rho[left,j] + rho[right,j] + (1/4)*(rho[left,down] + rho[right,down] + rho[left,up] + rho[right,up]) + mu_coex - v_j))
 
-                new_fancy_N = num_particles * 1/np.sum(rho_new)
-                if new_fancy_N != fancy_N:
-                    print(new_fancy_N)
-                    break
-
 
         conv = sum(sum((rho - rho_new)**2)); #Compute the convergence parameter.
         rho = alpha*rho_new + (1 - alpha)*rho #Mix the new and old solutions.
+        
+        # Normalization step
+        N = np.sum(rho_initial)  
+        N_current = np.sum(rho)
+        rho *= N / N_current  
 
-        rho[:,0] = maxsol
-        rho[:,-1] = minsol
+        rho[:, 0] = 0
+        rho[:, -1] = minsol
+    rho = rho.T
 
 
-    rho_t = rho.T
-    rho_t[0, :] = 0
 
-    jet_cmap = cm.get_cmap("jet", 512)
-    piss_cmap = ListedColormap(jet_cmap(np.linspace(0.2, 0.65, 256)))
 
-    plt.pcolor(rho_t, vmin=0, vmax=1, cmap = piss_cmap)
+
+    jet_cmap = pyplot.get_cmap("jet")
+    YlBu = ListedColormap(jet_cmap(np.linspace(0.2, 0.7, 256)))
+    
+    
+
+    plt.pcolor(rho_initial, vmin=0, vmax=1, cmap = YlBu)
     cbar = plt.colorbar()
     cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
-
     plt.xlabel(r"Lattice points $x/\sigma$")
     plt.ylabel(r"Lattice points $y/\sigma$")
-
-    plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
-
+    plt.title(rf"Initial droplet shape on {Lx}x{Ly} lattice")
     plt.show()
+    
+    
+    
+    plt.pcolor(rho, vmin=0, vmax=1, cmap = YlBu)
+    cbar = plt.colorbar()
+    cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
+    plt.xlabel(r"Lattice points $x/\sigma$")
+    plt.ylabel(r"Lattice points $y/\sigma$")
+    plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")    
+    plt.show()
+    # plt.yticks(np.linspace(0, Ly, Ly+1) + 0.5)
+    # plt.show()
+    
+    
+
+
+
+    # plt.pcolor(rho.T, vmin=0, vmax=1, cmap = piss_cmap)
+    # cbar = plt.colorbar()
+    # cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
+    # plt.xlabel(r"Lattice points $x/\sigma$")
+    # plt.ylabel(r"Lattice points $y/\sigma$")
+    # plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
+    # plt.show()
+    
+    problem14graphD(rho, Lx, Ly)
+    
+    
+    
+def problem14graphD(rho2D, Lx, Ly):
+    
+    rho = rho2D[:,int(Lx/2)]
+    
+    plt.plot(np.linspace(0, Ly, Ly), rho, "blue", marker="o")
+    bulkrhopg = np.ones(int(Ly/2))*min(rho[1:])
+    bulkrhopl = np.ones(int(Ly/2))*max(rho)
+    
+    plt.plot(np.linspace(Ly/2, Ly, int(Ly/2)), bulkrhopg, color="red", linestyle="--")
+    plt.plot(np.arange(Ly/2), bulkrhopl, color="red", linestyle="--")
+    plt.legend([r"$\mu/\epsilon$ = -2.5"])
+    plt.xlabel(r"Lattice points $y/\sigma$")
+    plt.ylabel(r"Density $\rho\sigma^2$")
+    plt.title(r"Droplet profile for $\beta\epsilon_w = 0.5$")
+    plt.show()
+    
+  
+    
 
 
 def main():
@@ -362,7 +417,7 @@ def main():
     # plotproblem12(P13_beta_vals)
     # plotproblem12(P13_beta_vals16)
 
-    problem14(0.5)
+    problem14(2.0)
 
 
 
