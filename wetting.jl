@@ -94,9 +94,9 @@ grads = []
 
 for i = 1:length(xs)-1
     gradient = (ys[i+1] - ys[i]) / (xs[i+1] - xs[i])
-    angle = 180 - rad2deg(atan(gradient))
+    angle = 180 - rad2deg(atan(abs(gradient)))
 
-    if floor(angle) == 115
+    if floor(angle) == 115 || ceil(angle) == 180 - 115
         push!(indices, i)
         push!(grads, gradient)
     end
@@ -106,7 +106,7 @@ for i = eachindex(indices)
     index = indices[i]
     grad = grads[i]
 
-    local x = xs[index]:(xs[index]+5)
+    local x = grad > 0 ? (xs[index]:xs[index]+5) : (xs[index]-5:xs[index])
     local y = (grad .* (x .- xs[index])) .+ ys[index]
     plot!(x, y, color=:black, legend=false)
 end
