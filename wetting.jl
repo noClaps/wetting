@@ -1,5 +1,9 @@
 using Roots
 using DelimitedFiles
+using ColorSchemes
+import Contour
+using Plots
+pythonplot()
 
 # Equation whose root defines the homogeneous equilibrium solutions:
 function func(beta, mu)
@@ -69,7 +73,43 @@ function problem14(beta_epsilon_wall)
     writedlm("problem14-$beta_epsilon_wall.csv", rho, ",")
 end
 
-beta = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
-for i = beta
-    problem14(i)
+# for beta = 0.1:0.1:2.0
+#     problem14(beta)
+# end
+
+rho = readdlm("problem14-0.5.csv", ',')
+x = 1:size(rho, 1)
+y = 1:size(rho, 2)
+
+colorscheme = cgrad(ColorScheme(get(ColorSchemes.jet, range(0.2, 0.7, 256))))
+# heatmap(rho, color=colorscheme)
+contourf(rho, color=colorscheme, title="Contour plot", xlabel="x positions", ylabel="y positions", colorbar_title="Density gradient", size=(1000, 400), levels=256)
+
+level = Contour.levels(Contour.contours(x, y, rho, 1))[1]
+line = first(Contour.lines(level))
+ys, xs = Contour.coordinates(line)
+
+indices = []
+grads = []
+
+for i = 1:length(xs)-1
+    gradient = (ys[i+1] - ys[i]) / (xs[i+1] - xs[i])
+    angle = 180 - rad2deg(atan(gradient))
+
+    if floor(angle) == 115
+        push!(indices, i)
+        push!(grads, gradient)
+    end
 end
+
+for i = eachindex(indices)
+    index = indices[i]
+    grad = grads[i]
+
+    local x = xs[index]:(xs[index]+5)
+    local y = (grad .* (x .- xs[index])) .+ ys[index]
+    plot!(x, y, color=:black, legend=false)
+end
+
+gui()
+readline()
