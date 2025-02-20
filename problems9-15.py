@@ -327,14 +327,14 @@ def problem14(beta_epsilon_wall):
     YlBu = ListedColormap(jet_cmap(np.linspace(0.2, 0.7, 256)))
 
 
-
-    plt.pcolor(rho_initial, vmin=0, vmax=1, cmap = YlBu)
-    cbar = plt.colorbar()
-    cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
-    plt.xlabel(r"Lattice points $x/\sigma$")
-    plt.ylabel(r"Lattice points $y/\sigma$")
-    plt.title(rf"Initial droplet shape on {Lx}x{Ly} lattice")
-    plt.show()
+    # PRINTS OUT INITIAL STATE
+    # plt.pcolor(rho_initial, vmin=0, vmax=1, cmap = YlBu)
+    # cbar = plt.colorbar()
+    # cbar.set_label(r"Density $\rho\sigma^2$", rotation=270, labelpad=20)
+    # plt.xlabel(r"Lattice points $x/\sigma$")
+    # plt.ylabel(r"Lattice points $y/\sigma$")
+    # plt.title(rf"Initial droplet shape on {Lx}x{Ly} lattice")
+    # plt.show()
 
 
 
@@ -353,7 +353,7 @@ def problem14(beta_epsilon_wall):
         plt.plot(np.arange(10) + 63, (np.arange(10))*np.tan(np.deg2rad(180 - 115)), color = "black", linestyle = "--", label = r"contact angle $theta$ = 115°")
     elif beta_epsilon_wall == 1.1:
         plt.plot(np.arange(10) + 17, abs((np.arange(10) + 1)*np.tan(np.deg2rad(180 - 49))), color = "black", linestyle = "--", label = r"contact angle $theta$ = 49°")
-    plt.legend()   
+    plt.legend(loc = 1)   
 
     plt.show()
 
