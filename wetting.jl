@@ -83,7 +83,7 @@ y = 1:size(rho, 2)
 
 colorscheme = cgrad(ColorScheme(get(ColorSchemes.jet, range(0.2, 0.7, 256))))
 # heatmap(rho, color=colorscheme)
-contourf(rho, color=colorscheme, title="Contour plot", xlabel="x positions", ylabel="y positions", colorbar_title="Density gradient", size=(1000, 400), levels=256)
+contourf(rho, color=colorscheme, title="Contour plot", xlabel="x positions", ylabel="y positions", colorbar_title="Density gradient", size=(100, 40) .* 12.5, levels=256)
 
 level = Contour.levels(Contour.contours(x, y, rho, 1))[1]
 line = first(Contour.lines(level))
