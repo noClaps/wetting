@@ -345,15 +345,15 @@ def problem14(beta_epsilon_wall):
     plt.ylabel(r"Lattice points $y/\sigma$")
     plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
 
-    xcontourpoints, ycontourpoints, angle = angles(f"./problem14-{beta_epsilon_wall}.csv", 1.2)
-    plt.plot(xcontourpoints, ycontourpoints + 1, color = "black", linestyle = "--", label = f"contact angle = {angle}°")
+    # xcontourpoints, ycontourpoints, angle = angles(f"./problem14-{beta_epsilon_wall}.csv", 1.2)
+    # plt.plot(xcontourpoints, ycontourpoints, color = "black", linestyle = "--", label = f"contact angle = {angle}°")
 
-    #Plotting angle
-    # if beta_epsilon_wall == 0.5:
-    #     plt.plot(np.arange(10) + 64, (np.arange(10))*np.tan(np.deg2rad(180 - 115)), color = "black", linestyle = "--", label = r"contact angle $theta$ = 115°")
-    # elif beta_epsilon_wall == 1.1:
-    #     plt.plot(np.arange(10) + 74, np.flip((np.arange(10) + 1)*np.tan(np.deg2rad(180 - 129))), color = "black", linestyle = "--", label = r"contact angle $theta$ = 61°")
-    # plt.legend()   
+    # Plotting angle
+    if beta_epsilon_wall == 0.5:
+        plt.plot(np.arange(10) + 63, (np.arange(10))*np.tan(np.deg2rad(180 - 115)), color = "black", linestyle = "--", label = r"contact angle $theta$ = 115°")
+    elif beta_epsilon_wall == 1.1:
+        plt.plot(np.arange(10) + 17, abs((np.arange(10) + 1)*np.tan(np.deg2rad(180 - 49))), color = "black", linestyle = "--", label = r"contact angle $theta$ = 49°")
+    plt.legend()   
 
     plt.show()
 
@@ -369,7 +369,7 @@ def problem14(beta_epsilon_wall):
     # plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
     # plt.show()
 
-    problem14graphD(rho, Lx, Ly, beta_epsilon_wall)
+    # problem14graphD(rho, Lx, Ly, beta_epsilon_wall)
 
 
 def problem14graphD(rho2D, Lx, Ly, beta_epsilon_wall):
@@ -418,15 +418,13 @@ def angles(csv_file, beta):
         angle = angle - 180
     
     tangent = abs((np.arange(1, 10 + 1, 1))*np.tan(np.deg2rad(180 - angle)))
-    xpoints = np.arange(min(xcontourpoints), max(xcontourpoints), (max(xcontourpoints)-min(xcontourpoints))/10)
-
-    # print(min(xcontourpoints), max(xcontourpoints))
+    xpoints = np.arange(min(xcontourpoints), min(xcontourpoints) + 10 )
 
 
     # print(tangent)
     # print(xpoints)
-    # plt.plot(xpoints,tangent)
-    # plt.show()
+    plt.plot(xpoints,tangent)
+    plt.show()
 
     return (xpoints, tangent, angle)
 
