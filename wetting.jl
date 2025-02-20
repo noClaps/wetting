@@ -66,7 +66,10 @@ function problem14(beta_epsilon_wall)
 
     rho = transpose(rho)
 
-    writedlm("problem14.csv", rho, ",")
+    writedlm("problem14-$beta_epsilon_wall.csv", rho, ",")
 end
 
-problem14(2.0)
+beta = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+for i = beta
+    problem14(i)
+end
