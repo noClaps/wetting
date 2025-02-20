@@ -5,6 +5,8 @@ import math
 from matplotlib import pyplot
 from matplotlib.colors import ListedColormap
 import polars as pl
+from skimage import measure
+from scipy.stats import linregress
 
 
 #Equation whose root defines the homogeneous equilibrium solutions:
@@ -153,7 +155,6 @@ def problem10(mu):
     plt.plot()
 
 
-
 def problem11(mu, Ly, beta_epsilon_wall):
 
     beta = 1.2 #Inverse temperature beta*epsilon
@@ -219,10 +220,6 @@ def plotproblem11():
     plt.show()
 
 
-
-
-
-
 def problem12(beta_eps_wall):
 
     num_vals = 20
@@ -260,10 +257,6 @@ def plotproblem12(beta_vals):
 
     plt.title("Adsorption at the wall")
     plt.show()
-
-
-
-
 
 
 def problem14(beta_epsilon_wall):
@@ -327,7 +320,7 @@ def problem14(beta_epsilon_wall):
     #     rho[:, -1] = minsol
     # rho = rho.T
 
-    rho = pl.read_csv("./problem14.csv", has_header=False)
+    rho = pl.read_csv(f"./problem14-{beta_epsilon_wall}.csv", has_header=False)
 
 
     jet_cmap = pyplot.get_cmap("jet")
@@ -351,9 +344,18 @@ def problem14(beta_epsilon_wall):
     plt.xlabel(r"Lattice points $x/\sigma$")
     plt.ylabel(r"Lattice points $y/\sigma$")
     plt.title(rf"Droplet shape on {Lx}x{Ly} lattice, $\beta\epsilon_w={beta_epsilon_wall}$")
+
+    xcontourpoints, ycontourpoints, angle = angles(f"./problem14-{beta_epsilon_wall}.csv", 1.2)
+    plt.plot(xcontourpoints, ycontourpoints + 1, color = "black", linestyle = "--", label = f"contact angle = {angle}°")
+
+    #Plotting angle
+    # if beta_epsilon_wall == 0.5:
+    #     plt.plot(np.arange(10) + 64, (np.arange(10))*np.tan(np.deg2rad(180 - 115)), color = "black", linestyle = "--", label = r"contact angle $theta$ = 115°")
+    # elif beta_epsilon_wall == 1.1:
+    #     plt.plot(np.arange(10) + 74, np.flip((np.arange(10) + 1)*np.tan(np.deg2rad(180 - 129))), color = "black", linestyle = "--", label = r"contact angle $theta$ = 61°")
+    # plt.legend()   
+
     plt.show()
-    # plt.yticks(np.linspace(0, Ly, Ly+1) + 0.5)
-    # plt.show()
 
 
 
@@ -370,7 +372,6 @@ def problem14(beta_epsilon_wall):
     problem14graphD(rho, Lx, Ly, beta_epsilon_wall)
 
 
-
 def problem14graphD(rho2D, Lx, Ly, beta_epsilon_wall):
 
     rho = rho2D[:,int(Lx/2)]
@@ -385,7 +386,55 @@ def problem14graphD(rho2D, Lx, Ly, beta_epsilon_wall):
     plt.xlabel(r"Lattice points $y/\sigma$")
     plt.ylabel(r"Density $\rho\sigma^2$")
     plt.title(fr"Droplet profile for $\beta\epsilon_w = {beta_epsilon_wall}$")
+
+
     plt.show()
+
+
+
+def angles(csv_file, beta):
+    rho = pl.read_csv(csv_file).to_numpy()
+
+    rhog = min(find_roots(func(beta,-5/2)))
+    rhol = max(find_roots(func(beta,-5/2)))
+    
+    rho_mid = (rhog + rhol) / 2
+    contours = measure.find_contours(rho, level=rho_mid)[0]
+
+    ycontourpoints, xcontourpoints = (contours[:,0], contours[:,1])
+
+    numpoints = 7
+    xcontourpoints = xcontourpoints[-numpoints:]
+    ycontourpoints = ycontourpoints[0:numpoints]
+    
+
+    gradient = 0
+    for i in range(numpoints - 1):
+        gradient += (ycontourpoints[i + 1] - ycontourpoints[i]) / (xcontourpoints[i + 1] - xcontourpoints[i])
+    gradient = gradient / (numpoints - 1)
+
+    angle = 180 - np.rad2deg(np.atan(gradient))
+    while angle > 180:
+        angle = angle - 180
+    
+    tangent = abs((np.arange(1, 10 + 1, 1))*np.tan(np.deg2rad(180 - angle)))
+    xpoints = np.arange(min(xcontourpoints), max(xcontourpoints), (max(xcontourpoints)-min(xcontourpoints))/10)
+
+    # print(min(xcontourpoints), max(xcontourpoints))
+
+
+    # print(tangent)
+    # print(xpoints)
+    # plt.plot(xpoints,tangent)
+    # plt.show()
+
+    return (xpoints, tangent, angle)
+
+
+
+
+    
+    
 
 
 
@@ -393,25 +442,17 @@ def problem14graphD(rho2D, Lx, Ly, beta_epsilon_wall):
 
 def main():
     # problem9()
-
-
     # problem10(-2.53)
-
-
     # plotproblem11()
-
     # problem12()
-
     # P12_beta_vals = [0.5, 2.0]
     # plotproblem12(P12_beta_vals)
-
     # P13_beta_vals = [1.6, 1.7, 1.8]
     # P13_beta_vals16 = [1.6]
     # plotproblem12(P13_beta_vals)
     # plotproblem12(P13_beta_vals16)
-
-    problem14(2.0)
-
+    problem14(1.1)
+    # x, y, a = angles("problem14-1.1.csv", 1.2)
 
 
 
