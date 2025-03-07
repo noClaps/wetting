@@ -1,0 +1,13 @@
+[tools]
+python = "3.11"
+julia = "latest"
+
+[env]
+'_'.python.venv = { path = ".venv", create = true }
+
+[tasks]
+install = ["pip install --upgrade pip", "pip install -r requirements.txt"]
+problems7-8 = "python problems7-8.py"
+problems9-15 = "python problems9-15.py"
+wetting = "julia wetting.jl"
+plot = "julia plot.jl"
