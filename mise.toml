@@ -1,6 +1,6 @@
 [tools]
-python = "3.11"
 julia = "latest"
+python = "latest"
 
 [env]
 '_'.python.venv = { path = ".venv", create = true }
